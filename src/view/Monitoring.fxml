@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #fff; -fx-background-radius: 8;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MonitoringController">
+    <children>
+      <Label layoutX="14.0" layoutY="105.0" text="INFORMAÇÕES" textFill="#656565">
+         <font>
+            <Font name="Rockwell Bold" size="20.0" />
+         </font>
+      </Label>
+      <Pane fx:id="paneInfo" layoutX="11.0" layoutY="136.0" prefHeight="454.0" prefWidth="388.0" style="-fx-background-color: #dfdfdf; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: transparent;">
+         <children>
+            <Label fx:id="lblSelectPatient" layoutX="49.0" layoutY="210.0" text="SELECIONE UM PACIENTE" textAlignment="CENTER" textFill="#c9c9c9" wrapText="true">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label fx:id="txtUserName" layoutX="20.0" layoutY="35.0" text="Nome Completo" textFill="#656565" visible="false">
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblUserName" layoutX="20.0" layoutY="61.0" prefHeight="25.0" prefWidth="348.0" textFill="#909090">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="txtRespiratoryFrequency" layoutX="20.0" layoutY="91.0" text="Frequência respiratória" textFill="#656565" visible="false">
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblRespiratoryFrequency" layoutX="20.0" layoutY="121.0" prefHeight="25.0" prefWidth="193.0" textFill="#909090">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="txtTemperature" layoutX="20.0" layoutY="146.0" text="Temperatura" textFill="#656565" visible="false">
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblTemperature" layoutX="20.0" layoutY="176.0" prefHeight="25.0" prefWidth="186.0" textFill="#909090">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="txtBloodOxygen" layoutX="20.0" layoutY="201.0" text="Oxigenação do sangue" textFill="#656565" visible="false">
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblBloodOxygen" layoutX="20.0" layoutY="231.0" prefHeight="25.0" prefWidth="193.0" textFill="#909090">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="txtHeartRate" layoutX="21.0" layoutY="256.0" text="Frequência cardíaca" textFill="#656565" visible="false">
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblHeartRate" layoutX="20.0" layoutY="286.0" prefHeight="25.0" prefWidth="193.0" textFill="#909090">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="txtBloodPressure" layoutX="21.0" layoutY="311.0" text="Pressão arterial" textFill="#656565" visible="false">
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblBloodPressure" layoutX="20.0" layoutY="341.0" prefHeight="25.0" prefWidth="193.0" textFill="#909090">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="txtSeverityLevel" layoutX="21.0" layoutY="366.0" text="Nível de gravidade" textFill="#656565" visible="false">
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblSeverityLevel" layoutX="20.0" layoutY="396.0" prefHeight="25.0" prefWidth="193.0" textFill="#909090">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+            </Label>
+         </children>
+      </Pane>
+      <TableView fx:id="table" layoutX="418.0" layoutY="136.0" prefHeight="454.0" prefWidth="471.0" style="-fx-background-radius: 8;">
+         <columns>
+            <TableColumn fx:id="clmID" prefWidth="137.0" style="-fx-font-size: 14; -fx-alignment: CENTER; -fx-border-color: transparent #d3d3d3 transparent #d3d3d3;" text="ID" />
+            <TableColumn fx:id="clmUserName" prefWidth="247.0" style="-fx-font-size: 14; -fx-alignment: CENTER; -fx-border-color: transparent #d3d3d3 transparent #d3d3d3;" text="Nome Completo" />
+            <TableColumn fx:id="clmSituation" prefWidth="84.0" style="-fx-font-size: 14; -fx-alignment: CENTER; -fx-border-color: transparent #d3d3d3 transparent #d3d3d3;" text="Situação" />
+         </columns>
+      </TableView>
+      <Label layoutX="786.0" layoutY="105.0" text="PACIENTES" textFill="#656565">
+         <font>
+            <Font name="Rockwell Bold" size="20.0" />
+         </font>
+      </Label>
+      <ImageView fitHeight="46.0" fitWidth="44.0" layoutX="19.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../image/monitoring-covid-icon.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="68.0" layoutY="20.0" text="MONITORAMENTO" textFill="#656565">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="737.0" layoutY="29.0" text="Status:" textFill="#656565">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblStatus" layoutX="789.0" layoutY="29.0" prefHeight="25.0" prefWidth="99.0">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <TextField fx:id="txtAmountPatients" layoutX="526.0" layoutY="108.0" prefHeight="25.0" prefWidth="85.0" text="5" />
+      <Label layoutX="418.0" layoutY="108.0" text="Qtd. Pacientes" textFill="#656565">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+    </children>
+</AnchorPane>
