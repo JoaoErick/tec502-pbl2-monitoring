@@ -103,6 +103,8 @@ public class MonitoringController implements Initializable {
 
     /*-------------------------- Constantes ----------------------------------*/
     private static final int REFRESH_TIME = 5000;
+    private static final String IP_ADDRESS = "localhost";
+    private static final int PORT = 12244;
     /*------------------------------------------------------------------------*/
 
     private static Socket client;
@@ -182,7 +184,7 @@ public class MonitoringController implements Initializable {
      */
     private static void initClient() {
         try {
-            client = new Socket("localhost", 12244);
+            client = new Socket(IP_ADDRESS, PORT);
             System.out.println("Conexão estabelecida!");
         } catch (IOException ioe) {
             System.err.println("Erro, a conexão com o servidor não foi "
@@ -191,9 +193,9 @@ public class MonitoringController implements Initializable {
 
             try {
                 client.close();
-            } catch (Exception e) {
+            } catch (IOException ioex) {
                 System.err.println("Não foi possível fechar a porta da conexão.");
-                System.out.println(e);
+                System.out.println(ioex);
             }
         }
     }
@@ -230,7 +232,7 @@ public class MonitoringController implements Initializable {
      */
     private void requestPatientsDevices() {
         try {
-            //Faz a conexão do cliente com o servidor.
+            //Faz a conexão com o servidor.
             initClient();
 
             patients.removeAll(patients);
@@ -269,10 +271,7 @@ public class MonitoringController implements Initializable {
                 );
             }
 
-            System.out.println("Resposta do servidor: " + jsonResponse);
-
             client.close();
-
         } catch (IOException ex) {
             Logger.getLogger(MonitoringController.class.getName()).log(Level.SEVERE, null, ex);
             lblStatus.setText("Sem conexão");
@@ -293,49 +292,11 @@ public class MonitoringController implements Initializable {
 
             if (temp != null) {
                 selected = temp;
-
-                paneInfo.setStyle("-fx-background-color: #eaeaea; -fx-border-color: #dfdfdf; -fx-border-radius: 8;");
-                lblSelectPatient.setVisible(false);
-
-                txtUserName.setVisible(true);
-                txtRespiratoryFrequency.setVisible(true);
-                txtTemperature.setVisible(true);
-                txtBloodOxygen.setVisible(true);
-                txtHeartRate.setVisible(true);
-                txtBloodPressure.setVisible(true);
-                txtSeverityLevel.setVisible(true);
-
-                lblUserName.setText(selected.getName());
-                lblRespiratoryFrequency.setText(String.valueOf(selected.getRespiratoryFrequency()) + " movimentos/min");
-                lblTemperature.setText(String.format("%.1f", selected.getBodyTemperature()).replace(",", ".") + " ºC");
-                lblBloodOxygen.setText(String.format("%.1f", selected.getBloodOxygenation()).replace(",", ".") + " %");
-                lblHeartRate.setText(String.valueOf(selected.getHeartRate()) + " batimentos/min");
-                lblBloodPressure.setText(String.valueOf(selected.getBloodPressure()) + " mmHg");
-                lblSeverityLevel.setText(String.format("%.1f", selected.getPatientSeverityLevel()).replace(",", "."));
-
+                this.setPatientInfosVisibility(true);
                 selectedRefresh = selected;
             } else {
-                paneInfo.setStyle("-fx-background-color: #dfdfdf; -fx-border-color: #dfdfdf; -fx-border-radius: 8;");
-                lblSelectPatient.setText("ERRO AO REQUISITAR \nOS DADOS");
-                lblSelectPatient.setVisible(true);
-
-                txtUserName.setVisible(false);
-                txtRespiratoryFrequency.setVisible(false);
-                txtTemperature.setVisible(false);
-                txtBloodOxygen.setVisible(false);
-                txtHeartRate.setVisible(false);
-                txtBloodPressure.setVisible(false);
-                txtSeverityLevel.setVisible(false);
-
-                lblUserName.setText("");
-                lblRespiratoryFrequency.setText("");
-                lblTemperature.setText("");
-                lblBloodOxygen.setText("");
-                lblHeartRate.setText("");
-                lblBloodPressure.setText("");
-                lblSeverityLevel.setText("");
+                this.setPatientInfosVisibility(false);
             }
-
         }
     }
 
@@ -349,7 +310,7 @@ public class MonitoringController implements Initializable {
         //Faz a conexão do cliente com o servidor.
         Socket conn = null;
         try {
-            conn = new Socket("localhost", 12244);
+            conn = new Socket(IP_ADDRESS, PORT);
             System.out.println("Conexão estabelecida!");
 
             JSONObject json = new JSONObject();
@@ -439,5 +400,47 @@ public class MonitoringController implements Initializable {
 
         }
     }
-    
+
+    /**
+     * Altera a visibilidade dos campos de informações dos pacientes.
+     *
+     * @param status boolean - true: Visível | false: Não visível
+     */
+    private void setPatientInfosVisibility(boolean status) {
+        if (status) {
+            paneInfo.setStyle("-fx-background-color: #eaeaea; -fx-border-color: #dfdfdf; -fx-border-radius: 8;");
+
+            lblUserName.setText(selected.getName());
+            lblRespiratoryFrequency.setText(String.valueOf(selected.getRespiratoryFrequency()) + " movimentos/min");
+            lblTemperature.setText(String.format("%.1f", selected.getBodyTemperature()).replace(",", ".") + " ºC");
+            lblBloodOxygen.setText(String.format("%.1f", selected.getBloodOxygenation()).replace(",", ".") + " %");
+            lblHeartRate.setText(String.valueOf(selected.getHeartRate()) + " batimentos/min");
+            lblBloodPressure.setText(String.valueOf(selected.getBloodPressure()) + " mmHg");
+            lblSeverityLevel.setText(String.format("%.1f", selected.getPatientSeverityLevel()).replace(",", "."));
+        } else {
+            paneInfo.setStyle("-fx-background-color: #dfdfdf; -fx-border-color: #dfdfdf; -fx-border-radius: 8;");
+            lblSelectPatient.setText("ERRO AO REQUISITAR \nOS DADOS");
+
+            lblUserName.setText("");
+            lblRespiratoryFrequency.setText("");
+            lblTemperature.setText("");
+            lblBloodOxygen.setText("");
+            lblHeartRate.setText("");
+            lblBloodPressure.setText("");
+            lblSeverityLevel.setText("");
+        }
+
+        /* Esse campo é o inverso dos demais */
+        lblSelectPatient.setVisible(!status);
+
+        txtUserName.setVisible(status);
+        txtRespiratoryFrequency.setVisible(status);
+        txtTemperature.setVisible(status);
+        txtBloodOxygen.setVisible(status);
+        txtHeartRate.setVisible(status);
+        txtBloodPressure.setVisible(status);
+        txtSeverityLevel.setVisible(status);
+
+    }
+
 }
