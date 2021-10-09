@@ -118,15 +118,10 @@ public class MonitoringController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
-        lblStatus.setText("aguardando...");
+        lblStatus.setText("Aguardando...");
 
         //Inicializa a tabela de pacientes.
-        try {
-            initTable();
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(MonitoringController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        initTable();
 
         //Armazena um paciente caso algum item da tabela de pacientes seja selecionado.
         table.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
@@ -142,7 +137,6 @@ public class MonitoringController implements Initializable {
          * Uma nova thread é inicializada concorrentemente ao sistema para fazer
          * requisições ao servidor. A cada 3 segundos, uma nova lista de
          * pacientes é requisitada e a tabela é atualizada.
-         *
          */
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -155,12 +149,9 @@ public class MonitoringController implements Initializable {
                         lblStatus.setText("Conectado");
                         lblStatus.setStyle("-fx-text-fill: green");
 
-                        try {
-                            requestPatientsDevices();
-                            showRefreshDetails();
-                        } catch (ClassNotFoundException ex) {
-                            Logger.getLogger(MonitoringController.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+                        requestPatientsDevices();
+                        showRefreshDetails();
+
                         table.setItems(listToObservableList());
                     }
                 };
@@ -179,7 +170,7 @@ public class MonitoringController implements Initializable {
                 }
             }
         });
-        
+
         /* Impede a thread de finalizar a JVM. */
         thread.setDaemon(true);
         thread.start();
@@ -193,11 +184,16 @@ public class MonitoringController implements Initializable {
         try {
             client = new Socket("localhost", 12244);
             System.out.println("Conexão estabelecida!");
-        } catch (IOException ex) {
-            System.out.println("Erro, a conexão com o servidor não foi estabelecida!");
+        } catch (IOException ioe) {
+            System.err.println("Erro, a conexão com o servidor não foi "
+                    + "estabelecida!");
+            System.out.println(ioe);
+
             try {
                 client.close();
-            } catch (Exception ec) {
+            } catch (Exception e) {
+                System.err.println("Não foi possível fechar a porta da conexão.");
+                System.out.println(e);
             }
         }
     }
@@ -206,10 +202,8 @@ public class MonitoringController implements Initializable {
      * Inicializa a tabela de pacientes com dados presentes na lista de
      * pacientes ordenada.
      *
-     * @throws ClassNotFoundException - Exceção lançada caso uma classe não seja
-     * encontrada.
      */
-    public void initTable() throws ClassNotFoundException {
+    public void initTable() {
         clmID.setCellValueFactory(new PropertyValueFactory("deviceId"));
         clmUserName.setCellValueFactory(new PropertyValueFactory("name"));
         clmSituation.setCellValueFactory(new PropertyValueFactory("isSeriousConditionLabel"));
@@ -234,11 +228,8 @@ public class MonitoringController implements Initializable {
 
     /**
      * Faz requisição ao servidor para resgatar a lista de pacientes do sistema.
-     *
-     * @throws ClassNotFoundException - Exceção lançada caso uma classe não seja
-     * encontrada.
      */
-    public void requestPatientsDevices() throws ClassNotFoundException {
+    public void requestPatientsDevices() {
         try {
             //Faz a conexão do cliente com o servidor.
             initClient();
@@ -288,6 +279,9 @@ public class MonitoringController implements Initializable {
             lblStatus.setText("Sem conexão");
             lblStatus.setStyle("-fx-text-fill: red");
             client = null;
+        } catch (ClassNotFoundException cnfe) {
+            System.err.println("Classe JSONObject não foi encontrada.");
+            System.out.println(cnfe);
         }
     }
 
@@ -383,18 +377,23 @@ public class MonitoringController implements Initializable {
                     jsonResponse.getJSONObject("data").getString("isSeriousConditionLabel"),
                     jsonResponse.getJSONObject("data").getFloat("patientSeverityLevel")
             );
-        } catch (IOException ex) {
-            System.out.println("Erro, a conexão com o servidor não foi estabelecida!");
+        } catch (IOException ioe) {
+            System.err.println("Erro, a conexão com o servidor não foi "
+                    + "estabelecida!");
+            System.out.println(ioe);
+
             try {
                 conn.close();
-            } catch (Exception ec) {
+            } catch (IOException e) {
+                System.err.println("Não foi possível fechar a porta da conexão.");
+                System.out.println(e);
             }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(MonitoringController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException cnfe) {
+            System.err.println("Classe JSONObject não foi encontrada.");
+            System.out.println(cnfe);
         }
 
         return null;
-
     }
 
     /**
@@ -402,17 +401,41 @@ public class MonitoringController implements Initializable {
      */
     public void showRefreshDetails() {
         if (selectedRefresh != null) {
-            PatientDevice temp = requestSpecificPatient(selectedRefresh.getDeviceId());
+            PatientDevice temp
+                    = requestSpecificPatient(selectedRefresh.getDeviceId());
+
             if (temp != null) {
                 selectedRefresh = temp;
 
                 lblUserName.setText(selectedRefresh.getName());
-                lblRespiratoryFrequency.setText(String.valueOf(selectedRefresh.getRespiratoryFrequency()) + " movimentos/min");
-                lblTemperature.setText(String.format("%.1f", selectedRefresh.getBodyTemperature()).replace(",", ".") + " ºC");
-                lblBloodOxygen.setText(String.format("%.1f", selectedRefresh.getBloodOxygenation()).replace(",", ".") + " %");
-                lblHeartRate.setText(String.valueOf(selectedRefresh.getHeartRate()) + " batimentos/min");
-                lblBloodPressure.setText(String.valueOf(selectedRefresh.getBloodPressure()) + " mmHg");
-                lblSeverityLevel.setText(String.format("%.1f", selectedRefresh.getPatientSeverityLevel()).replace(",", "."));
+                lblRespiratoryFrequency.setText(
+                        String.valueOf(
+                                selectedRefresh.getRespiratoryFrequency())
+                        + " movimentos/min"
+                );
+                lblTemperature.setText(
+                        String.format(
+                                "%.1f", selectedRefresh.getBodyTemperature()
+                        ).replace(",", ".") + " ºC"
+                );
+                lblBloodOxygen.setText(
+                        String.format(
+                                "%.1f", selectedRefresh.getBloodOxygenation()
+                        ).replace(",", ".") + " %"
+                );
+                lblHeartRate.setText(
+                        String.valueOf(selectedRefresh.getHeartRate())
+                        + " batimentos/min"
+                );
+                lblBloodPressure.setText(
+                        String.valueOf(selectedRefresh.getBloodPressure())
+                        + " mmHg"
+                );
+                lblSeverityLevel.setText(
+                        String.format(
+                                "%.1f", selectedRefresh.getPatientSeverityLevel()
+                        ).replace(",", ".")
+                );
             }
 
         }
