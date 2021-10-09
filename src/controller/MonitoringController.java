@@ -201,9 +201,8 @@ public class MonitoringController implements Initializable {
     /**
      * Inicializa a tabela de pacientes com dados presentes na lista de
      * pacientes ordenada.
-     *
      */
-    public void initTable() {
+    private void initTable() {
         clmID.setCellValueFactory(new PropertyValueFactory("deviceId"));
         clmUserName.setCellValueFactory(new PropertyValueFactory("name"));
         clmSituation.setCellValueFactory(new PropertyValueFactory("isSeriousConditionLabel"));
@@ -222,14 +221,14 @@ public class MonitoringController implements Initializable {
      *
      * @return ObservableList<PatientDevice> - Pacientes ordenados.
      */
-    public ObservableList<PatientDevice> listToObservableList() {
+    private ObservableList<PatientDevice> listToObservableList() {
         return FXCollections.observableArrayList(patients);
     }
 
     /**
      * Faz requisição ao servidor para resgatar a lista de pacientes do sistema.
      */
-    public void requestPatientsDevices() {
+    private void requestPatientsDevices() {
         try {
             //Faz a conexão do cliente com o servidor.
             initClient();
@@ -288,7 +287,7 @@ public class MonitoringController implements Initializable {
     /**
      * Exibe todas as informações do paciente selecionado.
      */
-    public void showDetails() {
+    private void showDetails() {
         if (selected != null) {
             PatientDevice temp = requestSpecificPatient(selected.getDeviceId());
 
@@ -346,7 +345,7 @@ public class MonitoringController implements Initializable {
      * @param deviceId String - Identificação do dispositivo.
      * @return PatientDevice
      */
-    public PatientDevice requestSpecificPatient(String deviceId) {
+    private PatientDevice requestSpecificPatient(String deviceId) {
         //Faz a conexão do cliente com o servidor.
         Socket conn = null;
         try {
@@ -399,7 +398,7 @@ public class MonitoringController implements Initializable {
     /**
      * Atualiza as informações do paciente selecionado.
      */
-    public void showRefreshDetails() {
+    private void showRefreshDetails() {
         if (selectedRefresh != null) {
             PatientDevice temp
                     = requestSpecificPatient(selectedRefresh.getDeviceId());
@@ -440,5 +439,5 @@ public class MonitoringController implements Initializable {
 
         }
     }
-
+    
 }
