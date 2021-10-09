@@ -102,7 +102,8 @@ public class MonitoringController implements Initializable {
     private TextField txtAmountPatients;
 
     /*-------------------------- Constantes ----------------------------------*/
-    private static final int REFRESH_TIME = 5000;
+    private static final int REFRESH_TIME_TABLE = 5000;
+    private static final int REFRESH_TIME_INFO = 4500;
     private static final String IP_ADDRESS = "localhost";
     private static final int PORT = 12244;
     /*------------------------------------------------------------------------*/
@@ -137,7 +138,7 @@ public class MonitoringController implements Initializable {
 
         /**
          * Uma nova thread é inicializada concorrentemente ao sistema para fazer
-         * requisições ao servidor. A cada 3 segundos, uma nova lista de
+         * requisições ao servidor. A cada REFRESH_TIME_TABLE, uma nova lista de
          * pacientes é requisitada e a tabela é atualizada.
          */
         Thread thread = new Thread(new Runnable() {
@@ -150,9 +151,7 @@ public class MonitoringController implements Initializable {
 
                         lblStatus.setText("Conectado");
                         lblStatus.setStyle("-fx-text-fill: green");
-
                         requestPatientsDevices();
-                        showRefreshDetails();
 
                         table.setItems(listToObservableList());
                     }
@@ -160,7 +159,7 @@ public class MonitoringController implements Initializable {
 
                 while (true) {
                     try {
-                        Thread.sleep(REFRESH_TIME);
+                        Thread.sleep(REFRESH_TIME_TABLE);
                     } catch (InterruptedException ie) {
                         System.err.println("Thread finalizada de maneira "
                                 + "inesperada.");
@@ -176,6 +175,42 @@ public class MonitoringController implements Initializable {
         /* Impede a thread de finalizar a JVM. */
         thread.setDaemon(true);
         thread.start();
+        
+        /**
+         * Uma nova thread é inicializada concorrentemente ao sistema para fazer
+         * requisições ao servidor. A cada REFRESH_TIME_INFO, as informações do
+         * paciente selecionado são atualizadas.
+         */
+        Thread threadUpdateInfo = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Runnable updater = new Runnable() {
+
+                    @Override
+                    public void run() {
+                        if(selectedRefresh != null)
+                            showRefreshDetails();
+                    }
+                };
+
+                while (true) {
+                    try {
+                        Thread.sleep(REFRESH_TIME_INFO);
+                    } catch (InterruptedException ie) {
+                        System.err.println("Thread de atualização de informação finalizada de maneira "
+                                + "inesperada.");
+                        System.out.println(ie);
+                    }
+
+                    // A atualização é feita na thread da aplicação.
+                    Platform.runLater(updater);
+                }
+            }
+        });
+
+        /* Impede a thread de finalizar a JVM. */
+        threadUpdateInfo.setDaemon(true);
+        threadUpdateInfo.start();
     }
 
     /**
@@ -308,7 +343,7 @@ public class MonitoringController implements Initializable {
             ObjectInputStream input = new ObjectInputStream(conn.getInputStream());
 
             JSONObject jsonResponse = (JSONObject) input.readObject();
-
+            
             return new PatientDevice(
                     jsonResponse.getJSONObject("data").getString("name"),
                     jsonResponse.getJSONObject("data").getString("deviceId"),
@@ -346,11 +381,11 @@ public class MonitoringController implements Initializable {
     private void showDetails() {
         if (selected != null) {
             PatientDevice temp = requestSpecificPatient(selected.getDeviceId());
-
-            if (temp != null) {
+            selectedRefresh = selected;
+            if (selectedRefresh != null) {
                 selected = temp;
                 this.setPatientInfosVisibility(true);
-                selectedRefresh = selected;
+                
             } else {
                 this.setPatientInfosVisibility(false);
             }
