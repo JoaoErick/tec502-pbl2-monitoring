@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller;
 
 import java.io.IOException;
@@ -81,13 +76,13 @@ public class MonitoringController implements Initializable {
 
     @FXML
     private Label lblBloodPressure;
-    
+
     @FXML
     private Label txtSeverityLevel;
-    
+
     @FXML
     private Label lblSeverityLevel;
-   
+
     @FXML
     private TableView<PatientDevice> table;
 
@@ -106,15 +101,12 @@ public class MonitoringController implements Initializable {
     @FXML
     private TextField txtAmountPatients;
 
-    /**
-     * Cliente Socket que fará conexão com o servidor.
-     */
+    /*-------------------------- Constantes ----------------------------------*/
+    private static final int REFRESH_TIME = 5000;
+    /*------------------------------------------------------------------------*/
+
     private static Socket client;
 
-    /**
-     * Armazena a lista de pacientes ordenada para que pacientes graves fiquem
-     * no início da lista.
-     */
     private static List<PatientDevice> patients = new ArrayList();
 
     //Armazena o paciente selecionado da tabela de pacientes.
@@ -153,7 +145,6 @@ public class MonitoringController implements Initializable {
          *
          */
         Thread thread = new Thread(new Runnable() {
-
             @Override
             public void run() {
                 Runnable updater = new Runnable() {
@@ -171,23 +162,25 @@ public class MonitoringController implements Initializable {
                             Logger.getLogger(MonitoringController.class.getName()).log(Level.SEVERE, null, ex);
                         }
                         table.setItems(listToObservableList());
-
                     }
                 };
 
                 while (true) {
                     try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException ex) {
+                        Thread.sleep(REFRESH_TIME);
+                    } catch (InterruptedException ie) {
+                        System.err.println("Thread finalizada de maneira "
+                                + "inesperada.");
+                        System.out.println(ie);
                     }
 
                     // A atualização é feita na thread da aplicação.
                     Platform.runLater(updater);
                 }
             }
-
         });
-        // Impede a thread de finalizar a JVM
+        
+        /* Impede a thread de finalizar a JVM. */
         thread.setDaemon(true);
         thread.start();
     }
@@ -230,7 +223,7 @@ public class MonitoringController implements Initializable {
     }
 
     /**
-     * Converte a lista de pacientes de forma a ser compatível com tabela da 
+     * Converte a lista de pacientes de forma a ser compatível com tabela da
      * interface.
      *
      * @return ObservableList<PatientDevice> - Pacientes ordenados.
@@ -259,12 +252,12 @@ public class MonitoringController implements Initializable {
             JSONObject json = new JSONObject();
             json.put("method", "GET");
             json.put("route", "/patients/" + amountPatients);
-            
+
             //Enviando a requisição para o servidor.
             ObjectOutputStream output = new ObjectOutputStream(client.getOutputStream());
             output.flush();
             output.writeObject(json);
-            
+
             //Recebendo a resposta do servidor.
             ObjectInputStream input = new ObjectInputStream(client.getInputStream());
 
@@ -304,9 +297,10 @@ public class MonitoringController implements Initializable {
     public void showDetails() {
         if (selected != null) {
             PatientDevice temp = requestSpecificPatient(selected.getDeviceId());
-            if(temp != null){
+
+            if (temp != null) {
                 selected = temp;
-                
+
                 paneInfo.setStyle("-fx-background-color: #eaeaea; -fx-border-color: #dfdfdf; -fx-border-radius: 8;");
                 lblSelectPatient.setVisible(false);
 
@@ -327,11 +321,11 @@ public class MonitoringController implements Initializable {
                 lblSeverityLevel.setText(String.format("%.1f", selected.getPatientSeverityLevel()).replace(",", "."));
 
                 selectedRefresh = selected;
-            } else{
+            } else {
                 paneInfo.setStyle("-fx-background-color: #dfdfdf; -fx-border-color: #dfdfdf; -fx-border-radius: 8;");
                 lblSelectPatient.setText("ERRO AO REQUISITAR \nOS DADOS");
                 lblSelectPatient.setVisible(true);
-                
+
                 txtUserName.setVisible(false);
                 txtRespiratoryFrequency.setVisible(false);
                 txtTemperature.setVisible(false);
@@ -348,13 +342,13 @@ public class MonitoringController implements Initializable {
                 lblBloodPressure.setText("");
                 lblSeverityLevel.setText("");
             }
-            
+
         }
     }
-    
+
     /**
      * Requisita todos os dados do paciente selecionado.
-     * 
+     *
      * @param deviceId String - Identificação do dispositivo.
      * @return PatientDevice
      */
@@ -376,7 +370,7 @@ public class MonitoringController implements Initializable {
             ObjectInputStream input = new ObjectInputStream(conn.getInputStream());
 
             JSONObject jsonResponse = (JSONObject) input.readObject();
-            
+
             return new PatientDevice(
                     jsonResponse.getJSONObject("data").getString("name"),
                     jsonResponse.getJSONObject("data").getString("deviceId"),
@@ -398,7 +392,7 @@ public class MonitoringController implements Initializable {
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(MonitoringController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return null;
 
     }
@@ -408,19 +402,18 @@ public class MonitoringController implements Initializable {
      */
     public void showRefreshDetails() {
         if (selectedRefresh != null) {
-                PatientDevice temp = requestSpecificPatient(selectedRefresh.getDeviceId());
-                if(temp != null){
-                    selectedRefresh = temp;
-                    
-                    lblUserName.setText(selectedRefresh.getName());
-                    lblRespiratoryFrequency.setText(String.valueOf(selectedRefresh.getRespiratoryFrequency()) + " movimentos/min");
-                    lblTemperature.setText(String.format("%.1f", selectedRefresh.getBodyTemperature()).replace(",", ".") + " ºC");
-                    lblBloodOxygen.setText(String.format("%.1f", selectedRefresh.getBloodOxygenation()).replace(",", ".") + " %");
-                    lblHeartRate.setText(String.valueOf(selectedRefresh.getHeartRate()) + " batimentos/min");
-                    lblBloodPressure.setText(String.valueOf(selectedRefresh.getBloodPressure()) + " mmHg");
-                    lblSeverityLevel.setText(String.format("%.1f", selectedRefresh.getPatientSeverityLevel()).replace(",", "."));
-                }
-                  
+            PatientDevice temp = requestSpecificPatient(selectedRefresh.getDeviceId());
+            if (temp != null) {
+                selectedRefresh = temp;
+
+                lblUserName.setText(selectedRefresh.getName());
+                lblRespiratoryFrequency.setText(String.valueOf(selectedRefresh.getRespiratoryFrequency()) + " movimentos/min");
+                lblTemperature.setText(String.format("%.1f", selectedRefresh.getBodyTemperature()).replace(",", ".") + " ºC");
+                lblBloodOxygen.setText(String.format("%.1f", selectedRefresh.getBloodOxygenation()).replace(",", ".") + " %");
+                lblHeartRate.setText(String.valueOf(selectedRefresh.getHeartRate()) + " batimentos/min");
+                lblBloodPressure.setText(String.valueOf(selectedRefresh.getBloodPressure()) + " mmHg");
+                lblSeverityLevel.setText(String.format("%.1f", selectedRefresh.getPatientSeverityLevel()).replace(",", "."));
+            }
 
         }
     }
