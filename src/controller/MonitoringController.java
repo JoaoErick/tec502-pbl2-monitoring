@@ -284,23 +284,6 @@ public class MonitoringController implements Initializable {
     }
 
     /**
-     * Exibe todas as informações do paciente selecionado.
-     */
-    private void showDetails() {
-        if (selected != null) {
-            PatientDevice temp = requestSpecificPatient(selected.getDeviceId());
-
-            if (temp != null) {
-                selected = temp;
-                this.setPatientInfosVisibility(true);
-                selectedRefresh = selected;
-            } else {
-                this.setPatientInfosVisibility(false);
-            }
-        }
-    }
-
-    /**
      * Requisita todos os dados do paciente selecionado.
      *
      * @param deviceId String - Identificação do dispositivo.
@@ -309,6 +292,7 @@ public class MonitoringController implements Initializable {
     private PatientDevice requestSpecificPatient(String deviceId) {
         //Faz a conexão do cliente com o servidor.
         Socket conn = null;
+
         try {
             conn = new Socket(IP_ADDRESS, PORT);
             System.out.println("Conexão estabelecida!");
@@ -354,6 +338,23 @@ public class MonitoringController implements Initializable {
         }
 
         return null;
+    }
+
+    /**
+     * Exibe todas as informações do paciente selecionado.
+     */
+    private void showDetails() {
+        if (selected != null) {
+            PatientDevice temp = requestSpecificPatient(selected.getDeviceId());
+
+            if (temp != null) {
+                selected = temp;
+                this.setPatientInfosVisibility(true);
+                selectedRefresh = selected;
+            } else {
+                this.setPatientInfosVisibility(false);
+            }
+        }
     }
 
     /**
@@ -442,5 +443,4 @@ public class MonitoringController implements Initializable {
         txtSeverityLevel.setVisible(status);
 
     }
-
 }
