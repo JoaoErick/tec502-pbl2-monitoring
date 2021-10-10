@@ -105,7 +105,7 @@ public class MonitoringController implements Initializable {
     private static final int REFRESH_TIME_TABLE = 5000;
     private static final int REFRESH_TIME_INFO = 4500;
     private static final String IP_ADDRESS = "localhost";
-    private static final int PORT = 12244;
+    private static final int PORT = 12250;
     /*------------------------------------------------------------------------*/
 
     private static Socket client;
