@@ -1,7 +1,7 @@
 # tec502-pbl2-monitoring
 
 <p align="center">
-  <img src="https://camo.githubusercontent.com/36f1d28fca24798651a573a464fa238b0af8599cb951e74a985f3dcca1224526/68747470733a2f2f692e696d6775722e636f6d2f656845457571592e706e67" alt="server icon" width="650px" height="450px">
+  <img src="https://i.imgur.com/hs6G3TG.png" alt="monitoring icon" width="650px" height="450px">
 </p>
 
 ------------
