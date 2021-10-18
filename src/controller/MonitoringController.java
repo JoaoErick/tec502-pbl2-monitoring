@@ -102,8 +102,8 @@ public class MonitoringController implements Initializable {
     private TextField txtAmountPatients;
 
     /*-------------------------- Constantes ----------------------------------*/
-    private static final int REFRESH_TIME_TABLE = 5000;
-    private static final int REFRESH_TIME_INFO = 4500;
+    private static final int REFRESH_TIME_TABLE = 6000;
+    private static final int REFRESH_TIME_INFO = 5500;
     private static final String IP_ADDRESS = "localhost";
     private static final int PORT = 12250;
     /*------------------------------------------------------------------------*/
