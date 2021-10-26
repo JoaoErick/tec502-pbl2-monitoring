@@ -213,6 +213,17 @@ public class MonitoringController implements Initializable {
         /* Impede a thread de finalizar a JVM. */
         threadUpdateInfo.setDaemon(true);
         threadUpdateInfo.start();
+        
+        //Limitando os tipos de caracteres que podem ser digitados nos campos de texto.
+        txtAmountPatients.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, 
+                String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    txtAmountPatients.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
     }
 
     /**
@@ -250,7 +261,7 @@ public class MonitoringController implements Initializable {
             requestPatientsDevices();
             table.setItems(listToObservableList());
         } else {
-            System.out.println("A aplicação não conseguiu se conectar ao servidor!");
+            System.out.println("Tentando se conectar ao servidor...");
         }
     }
 
@@ -330,17 +341,20 @@ public class MonitoringController implements Initializable {
      * @param deviceId String - Identificação do dispositivo.
      * @return PatientDevice
      */
-    private PatientDevice requestSpecificPatient(String deviceId) {
+    private PatientDevice requestSpecificPatient(PatientDevice patientDevice) {
         //Faz a conexão do cliente com o servidor.
         Socket conn = null;
 
         try {
-            conn = new Socket(IP_ADDRESS, PORT);
-            System.out.println("Conexão estabelecida!");
+            conn = new Socket(
+                    patientDevice.getFogServer().getAddress(), 
+                    patientDevice.getFogServer().getPort()
+            );
+            System.out.println("Conexão estabelecida com a Fog do paciente!");
 
             JSONObject json = new JSONObject();
             json.put("method", "GET");
-            json.put("route", "/patient/" + deviceId);
+            json.put("route", "/patient/" + patientDevice.getDeviceId());
 
             ObjectOutputStream output = new ObjectOutputStream(conn.getOutputStream());
             output.flush();
@@ -349,6 +363,13 @@ public class MonitoringController implements Initializable {
             ObjectInputStream input = new ObjectInputStream(conn.getInputStream());
 
             JSONObject jsonResponse = (JSONObject) input.readObject();
+            
+            conn.close();
+            
+            if(jsonResponse.has("error")){
+                setPatientInfosVisibility(false);
+                return null;
+            }
             
             return new PatientDevice(
                     jsonResponse.getJSONObject("data").getString("name"),
@@ -387,7 +408,7 @@ public class MonitoringController implements Initializable {
      */
     private void showDetails() {
         if (selected != null) {
-            PatientDevice temp = requestSpecificPatient(selected.getDeviceId());
+            PatientDevice temp = requestSpecificPatient(selected);
             selectedRefresh = selected;
             if (selectedRefresh != null) {
                 selected = temp;
@@ -405,7 +426,7 @@ public class MonitoringController implements Initializable {
     private void showRefreshDetails() {
         if (selectedRefresh != null) {
             PatientDevice temp
-                    = requestSpecificPatient(selectedRefresh.getDeviceId());
+                    = requestSpecificPatient(selectedRefresh);
 
             if (temp != null) {
                 selectedRefresh = temp;
