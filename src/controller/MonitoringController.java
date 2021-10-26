@@ -23,6 +23,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
+import models.FogServer;
 import models.PatientDevice;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -175,7 +176,7 @@ public class MonitoringController implements Initializable {
         /* Impede a thread de finalizar a JVM. */
         thread.setDaemon(true);
         thread.start();
-        
+
         /**
          * Uma nova thread é inicializada concorrentemente ao sistema para fazer
          * requisições ao servidor. A cada REFRESH_TIME_INFO, as informações do
@@ -188,8 +189,9 @@ public class MonitoringController implements Initializable {
 
                     @Override
                     public void run() {
-                        if(selectedRefresh != null)
+                        if (selectedRefresh != null) {
                             showRefreshDetails();
+                        }
                     }
                 };
 
@@ -291,6 +293,8 @@ public class MonitoringController implements Initializable {
             JSONObject jsonResponse = (JSONObject) input.readObject();
 
             JSONArray jsonArray = jsonResponse.getJSONArray("data");
+            
+            
 
             /* Adicionando os dispositivos dos pacientes em uma lista.*/
             for (int i = 0; i < jsonArray.length(); i++) {
@@ -301,7 +305,9 @@ public class MonitoringController implements Initializable {
                                 jsonArray.getJSONObject(i).
                                         getString("deviceId"),
                                 jsonArray.getJSONObject(i).
-                                        getString("isSeriousConditionLabel")
+                                        getString("isSeriousConditionLabel"),
+                                (FogServer) jsonArray.getJSONObject(i).
+                                        get("fogServer")
                         )
                 );
             }
@@ -354,7 +360,8 @@ public class MonitoringController implements Initializable {
                     jsonResponse.getJSONObject("data").getInt("heartRate"),
                     jsonResponse.getJSONObject("data").getBoolean("isSeriousCondition"),
                     jsonResponse.getJSONObject("data").getString("isSeriousConditionLabel"),
-                    jsonResponse.getJSONObject("data").getFloat("patientSeverityLevel")
+                    jsonResponse.getJSONObject("data").getFloat("patientSeverityLevel"),
+                    (FogServer) jsonResponse.getJSONObject("data").get("fogServer")
             );
         } catch (IOException ioe) {
             System.err.println("Erro, a conexão com o servidor não foi "
@@ -385,7 +392,7 @@ public class MonitoringController implements Initializable {
             if (selectedRefresh != null) {
                 selected = temp;
                 this.setPatientInfosVisibility(true);
-                
+
             } else {
                 this.setPatientInfosVisibility(false);
             }
