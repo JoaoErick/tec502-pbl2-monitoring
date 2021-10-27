@@ -153,7 +153,7 @@ public class MonitoringController implements Initializable {
                         lblStatus.setText("Conectado");
                         lblStatus.setStyle("-fx-text-fill: green");
                         requestPatientsDevices();
-
+                        
                         table.setItems(listToObservableList());
                     }
                 };
