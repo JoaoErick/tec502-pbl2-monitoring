@@ -302,10 +302,10 @@ public class MonitoringController implements Initializable {
             ObjectInputStream input = new ObjectInputStream(client.getInputStream());
 
             JSONObject jsonResponse = (JSONObject) input.readObject();
-
+            
             JSONArray jsonArray = jsonResponse.getJSONArray("data");
             
-            
+
 
             /* Adicionando os dispositivos dos pacientes em uma lista.*/
             for (int i = 0; i < jsonArray.length(); i++) {
